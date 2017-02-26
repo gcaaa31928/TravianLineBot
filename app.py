@@ -19,6 +19,8 @@ secret = os.environ.get('SECRET', None)
 
 line_bot_api = LineBotApi(access_token)
 handler = WebhookHandler(secret)
+messages = []
+message_index = 0
 
 
 @app.route("/callback", methods=['POST'])
@@ -40,21 +42,38 @@ def callback():
     return 'OK'
 
 
+def handle_message(data):
+    print(data)
+    if data['type'] == 'in_raid':
+        messages.append('{} 正被攻擊'.format(data['name']))
+
+
 @app.route('/')
 def hello():
     return 'Hello World'
 
+
 @app.route('/message', methods=['POST'])
-def in_raid():
-    pass
+def message():
+    data = request.form
+    handle_message(data)
+    return 'ok'
 
 
 @handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
+def handle_message_event(event):
     print(event)
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=event.message.text))
+    text = event.message.text
+    if text == '目前狀態':
+        if len(messages) == 0:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text='沒有任何事件發生'))
+        for message in messages:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=message))
+        messages.clear()
 
 
 @handler.add(JoinEvent)
@@ -62,7 +81,8 @@ def handle_join(event):
     print('join', event)
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text='Joined this ' + event.source.type))
+        TextSendMessage(text='超神掛掛進場'))
+
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='127.0.0.1', port=5000)
