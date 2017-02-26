@@ -22,6 +22,7 @@ handler = WebhookHandler(secret)
 
 @app.route("/callback", methods=['POST'])
 def callback():
+    print(access_token, secret)
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
 
