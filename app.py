@@ -43,9 +43,7 @@ def callback():
 
 
 def handle_message(data):
-    print(data)
-    if data['type'] == 'in_raid':
-        messages.append('{} 正被攻擊'.format(data['name']))
+    messages.append('{}'.format(data['message']))
 
 
 @app.route('/')
@@ -69,10 +67,10 @@ def handle_message_event(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text='沒有任何事件發生'))
-        for message in messages:
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text=message))
+        all_message = '\n'.join(messages)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=all_message))
         messages.clear()
 
 
