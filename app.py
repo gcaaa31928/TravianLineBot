@@ -8,6 +8,7 @@ from linebot import (
 from linebot.exceptions import (
     InvalidSignatureError
 )
+from linebot.models import JoinEvent
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
@@ -43,6 +44,10 @@ def callback():
 def hello():
     return 'Hello World'
 
+@app.route('/message', methods=['POST'])
+def in_raid():
+    pass
+
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -51,6 +56,13 @@ def handle_message(event):
         event.reply_token,
         TextSendMessage(text=event.message.text))
 
+
+@handler.add(JoinEvent)
+def handle_join(event):
+    print('join', event)
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text='Joined this ' + event.source.type))
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)
