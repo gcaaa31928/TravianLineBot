@@ -46,9 +46,10 @@ def callback():
 
 def handle_message(data):
     msg = str(data['message'])
+    name = str(data['name'])
     db = TinyDB('db.json')
-    if not db.contains(Query().message == msg):
-        db.insert({'message': msg})
+    if not db.contains(Query().name == name):
+        db.insert({'message': msg, 'name': name})
 
 
 def get_all_messages():
@@ -86,7 +87,6 @@ def handle_message_event(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=get_all_messages()))
-        clear_messages()
 
 
 @handler.add(JoinEvent)
