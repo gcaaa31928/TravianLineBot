@@ -74,7 +74,8 @@ def hello():
 
 @app.route('/message', methods=['POST'])
 def message():
-    data = request.form
+    data = request.get_json()
+    print(data)
     handle_message(data)
     return 'ok'
 
