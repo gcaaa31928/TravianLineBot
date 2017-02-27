@@ -53,6 +53,8 @@ def handle_message(data):
 def get_all_messages():
     all_messages = ''
     db = TinyDB('db.json')
+    if len(db.all()) == 0:
+        return '沒有任何事件發生'
     for data in db.all():
         all_messages += data['message']
     return all_messages
@@ -80,10 +82,6 @@ def handle_message_event(event):
     print(event)
     text = event.message.text
     if text == '目前狀態':
-        if len(messages) == 0:
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text='沒有任何事件發生'))
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=get_all_messages()))
