@@ -48,8 +48,7 @@ def handle_message(data):
     msg = str(data['message'])
     name = str(data['key'])
     db = TinyDB('db.json')
-    if not db.contains(Query().name == name):
-        db.insert({'message': msg, 'name': name})
+    db.update({'message': msg, 'name': name}, Query().name == name)
 
 
 def get_all_messages():
