@@ -12,6 +12,8 @@ from linebot.models import JoinEvent
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
+from tinydb import Query
+from tinydb import TinyDB
 
 app = Flask(__name__)
 access_token = os.environ.get('ACCESS_TOKEN', None)
@@ -43,7 +45,22 @@ def callback():
 
 
 def handle_message(data):
-    messages.append('{}'.format(data['message']))
+    print(data['message'])
+    db = TinyDB('db.json')
+    db.insert({'type': str(data['message'])})
+
+
+def get_all_messages():
+    all_messages = ''
+    db = TinyDB('db.json')
+    for data in db.all():
+        all_messages += data['message']
+    return all_messages
+
+
+def clear_messages():
+    db = TinyDB('db.json')
+    db.remove(Query().message.all)
 
 
 @app.route('/')
@@ -67,11 +84,10 @@ def handle_message_event(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text='沒有任何事件發生'))
-        all_message = '\n'.join(messages)
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=all_message))
-        messages.clear()
+            TextSendMessage(text=get_all_messages()))
+        clear_messages()
 
 
 @handler.add(JoinEvent)
@@ -83,4 +99,6 @@ def handle_join(event):
 
 
 if __name__ == "__main__":
+    # clear_messages()
     app.run(host='127.0.0.1', port=5000)
+
