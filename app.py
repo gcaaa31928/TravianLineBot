@@ -46,7 +46,7 @@ def callback():
 
 def handle_message(data):
     msg = str(data['message'])
-    name = str(data['name'])
+    name = str(data['key'])
     db = TinyDB('db.json')
     if not db.contains(Query().name == name):
         db.insert({'message': msg, 'name': name})
