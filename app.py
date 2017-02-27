@@ -55,8 +55,8 @@ def get_all_messages():
     db = TinyDB('db.json')
     if len(db.all()) == 0:
         return '沒有任何事件發生'
-    for data in db.all():
-        all_messages += data['message']
+    for index, data in enumerate(db.all()):
+        all_messages += '{}. {}\n'.format(index, data['message'])
     return all_messages
 
 
@@ -99,4 +99,3 @@ def handle_join(event):
 if __name__ == "__main__":
     # clear_messages()
     app.run(host='127.0.0.1', port=5000)
-
