@@ -47,7 +47,7 @@ def callback():
 def handle_message(data):
     print(data['message'])
     db = TinyDB('db.json')
-    db.insert({'type': str(data['message'])})
+    db.insert({'message': str(data['message'])})
 
 
 def get_all_messages():
