@@ -15,7 +15,6 @@ from linebot.models import (
 from tinydb import Query
 from tinydb import TinyDB
 
-from chat import chatbot
 
 app = Flask(__name__)
 access_token = os.environ.get('ACCESS_TOKEN', None)
