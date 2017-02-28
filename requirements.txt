@@ -3,4 +3,3 @@ flask
 Flask-SSLify
 gunicorn
 tinydb
-chatterbot
