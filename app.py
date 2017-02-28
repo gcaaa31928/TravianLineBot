@@ -88,15 +88,11 @@ def message():
 def handle_message_event(event):
     print(event)
     text = event.message.text
-    if text == '目前狀態':
+    if '狀態' in text:
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=get_all_messages()))
-    if '掛掛' in text:
-        text = text.replace('掛掛', '')
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=chatbot.get_response(text)))
+
 
 @handler.add(JoinEvent)
 def handle_join(event):
