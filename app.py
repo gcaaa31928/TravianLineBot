@@ -73,9 +73,9 @@ def handle_message(data):
     msg = str(data['message'])
     name = str(data['key'])
     if message_table.contains(Query().name == name):
-        message_table.update({'message': msg, 'name': name}, Query().name == name)
+        message_table.update({'message': msg, 'key': name}, Query().name == name)
     else:
-        message_table.insert({'message': msg, 'name': name})
+        message_table.insert({'message': msg, 'key': name})
 
 
 def get_all_messages():
@@ -136,9 +136,6 @@ def handle_message_event(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text=get_report(name)))
-
-
-
 
 
 @handler.add(JoinEvent)
