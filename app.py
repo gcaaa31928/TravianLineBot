@@ -50,10 +50,10 @@ def callback():
 def handle_report(data):
     report = str(data['report'])
     name = str(data['key'])
-    if report_table.contains(Query().key == name):
-        report_table.update({'report': report, 'key': name}, Query().key == name)
+    if report_table.contains(Query().name == name):
+        report_table.update({'report': report, 'name': name}, Query().name == name)
     else:
-        report_table.insert({'report': report, 'key': name})
+        report_table.insert({'report': report, 'name': name})
 
 
 def get_all_reports():
@@ -61,12 +61,12 @@ def get_all_reports():
     if len(report_table.all()) == 0:
         return '沒有任何事件發生'
     for index, data in enumerate(report_table.all()):
-        all_messages += '{}. {}\n'.format(data['key'], data['report'])
+        all_messages += '{}. {}\n'.format(data['name'], data['report'])
     return all_messages
 
 
 def get_report(name):
-    return report_table.get(Query().key == name)['report']
+    return report_table.get(Query().name == name)['report']
 
 
 def handle_message(data):
@@ -88,7 +88,7 @@ def get_all_messages():
 
 
 def get_message(name):
-    return message_table.get(Query().key == name)['message']
+    return message_table.get(Query().name == name)['message']
 
 
 @app.route('/')
