@@ -88,7 +88,7 @@ def get_all_messages():
 
 
 def get_message(name):
-    print(name, message_table.get(Query().name == "GCA"))
+    print(message_table.all())
     return message_table.get(Query().name == name)['message']
 
 
