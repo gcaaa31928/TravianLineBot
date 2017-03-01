@@ -51,9 +51,9 @@ def handle_report(data):
     report = str(data['report'])
     name = str(data['key'])
     if report_table.contains(Query().name == name):
-        report_table.update({'report': report, 'name': name}, Query().name == name)
+        report_table.update({'report': report, 'key': name}, Query().name == name)
     else:
-        report_table.insert({'report': report, 'name': name})
+        report_table.insert({'report': report, 'key': name})
 
 
 def get_all_reports():
