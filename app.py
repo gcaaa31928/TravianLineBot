@@ -61,7 +61,7 @@ def get_all_reports():
     if len(report_table.all()) == 0:
         return '沒有任何事件發生'
     for index, data in enumerate(report_table.all()):
-        all_messages += '{}. {}\n'.format(index, data['report'])
+        all_messages += '{}. {}\n'.format(data['key'], data['report'])
     return all_messages
 
 
@@ -83,7 +83,7 @@ def get_all_messages():
     if len(message_table.all()) == 0:
         return '沒有任何事件發生'
     for index, data in enumerate(message_table.all()):
-        all_messages += '{}. {}\n'.format(index, data['message'])
+        all_messages += '{}\n'.format(data['message'])
     return all_messages
 
 
@@ -125,14 +125,8 @@ def handle_message_event(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text=get_message(name)))
-
-
-@handler.add(MessageEvent, message=TextMessage)
-def handle_message_event(event):
-    print(event)
-    text = event.message.text
-    if '狀態' in text:
-        text = text.replace('狀態', '')
+    elif '報告' in text:
+        text = text.replace('報告', '')
         if text == '':
             line_bot_api.reply_message(
                 event.reply_token,
@@ -142,6 +136,9 @@ def handle_message_event(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text=get_report(name)))
+
+
+
 
 
 @handler.add(JoinEvent)
