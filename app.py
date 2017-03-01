@@ -24,8 +24,8 @@ handler = WebhookHandler(secret)
 messages = []
 message_index = 0
 db = TinyDB('db.json')
-message_table = db.table('message')
-report_table = db.table('report')
+message_table = db.table('message_table')
+report_table = db.table('report_table')
 
 
 @app.route("/callback", methods=['POST'])
@@ -88,7 +88,7 @@ def get_all_messages():
 
 
 def get_message(name):
-    print(name, message_table.get(Query().name == name))
+    print(name, message_table.get(Query().name == "GCA"))
     return message_table.get(Query().name == name)['message']
 
 
