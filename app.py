@@ -68,7 +68,6 @@ def handle_report(data):
         report_table.update({'report': report, 'name': name}, Query().name == name)
     else:
         report_table.insert({'report': report, 'name': name})
-    print(get_report_image('GCA', 1))
 
 
 def get_all_reports():
