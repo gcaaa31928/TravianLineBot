@@ -20,9 +20,8 @@ from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
 
 app = Flask(__name__)
-access_token = os.environ.get('ACCESS_TOKEN',
-                              'Q+VCL2yaFLwzV8wFK19H7glBB/kj1fHm7G8Apxv2HZv8GTSlg9V8c38/VQvSMvQtcG+38nv2OlAZVrT7ZmSm+1HT1pWbE29a0ROZ27y0mchjOdeZ2hnW0HwA/wtIDNrbKNezIbc43wAo1dtOTsiMPgdB04t89/1O/w1cDnyilFU=')
-secret = os.environ.get('SECRET', '64d7bbe9e32d897d48e35a323e6f0642')
+access_token = os.environ.get('ACCESS_TOKEN', None)
+secret = os.environ.get('SECRET', None)
 
 line_bot_api = LineBotApi(access_token)
 handler = WebhookHandler(secret)
@@ -177,7 +176,7 @@ def handle_message_event(event):
                 event.reply_token,
                 TextSendMessage(text=get_message(name)))
     elif '報告' in text:
-        matches = re.search('(.*)報告(\d+)', text)
+        matches = re.search('(.*)報告(\d*)', text)
         if matches.group(1) == '' and matches.group(2) == '':
             line_bot_api.reply_message(
                 event.reply_token,
