@@ -77,8 +77,8 @@ def get_all_reports():
     for data in report_table.all():
         all_messages += '{}.\n'.format(data['name'])
         reports = parseJson(data['report'])
-        for report in reports:
-            all_messages += '{}'.format(report['info'])
+        for index, report in enumerate(reports):
+            all_messages += '{}. {}'.format(index + 1, report['info'])
     return all_messages
 
 
@@ -86,17 +86,9 @@ def get_report(name):
     reports = report_table.get(Query().name == name)['report']
     all_messages = ''
     reports = parseJson(reports)
-    for report in reports:
-        all_messages += '{}'.format(report['info'])
+    for index, report in enumerate(reports):
+        all_messages += '{}. {}'.format(index + 1, report['info'])
     return all_messages
-
-
-def get_image_from_url(url):
-    r = requests.post('https://web-capture.net/zh_TW/initiate_conversion.php', files={
-        'link': url,
-        'output': 'jpeg',
-    })
-    return r.status_code
 
 
 def report_url(content):
