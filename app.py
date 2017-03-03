@@ -1,7 +1,8 @@
 import json
 import os
 import re
-
+import urllib
+import requests
 from flask import Flask, request, abort
 
 from linebot import (
@@ -19,7 +20,8 @@ from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
 
 app = Flask(__name__)
-access_token = os.environ.get('ACCESS_TOKEN', 'Q+VCL2yaFLwzV8wFK19H7glBB/kj1fHm7G8Apxv2HZv8GTSlg9V8c38/VQvSMvQtcG+38nv2OlAZVrT7ZmSm+1HT1pWbE29a0ROZ27y0mchjOdeZ2hnW0HwA/wtIDNrbKNezIbc43wAo1dtOTsiMPgdB04t89/1O/w1cDnyilFU=')
+access_token = os.environ.get('ACCESS_TOKEN',
+                              'Q+VCL2yaFLwzV8wFK19H7glBB/kj1fHm7G8Apxv2HZv8GTSlg9V8c38/VQvSMvQtcG+38nv2OlAZVrT7ZmSm+1HT1pWbE29a0ROZ27y0mchjOdeZ2hnW0HwA/wtIDNrbKNezIbc43wAo1dtOTsiMPgdB04t89/1O/w1cDnyilFU=')
 secret = os.environ.get('SECRET', '64d7bbe9e32d897d48e35a323e6f0642')
 
 line_bot_api = LineBotApi(access_token)
@@ -90,11 +92,33 @@ def get_report(name):
         all_messages += '{}'.format(report['info'])
     return all_messages
 
-def get_report_image(name, index):
+
+def get_image_from_url(url):
+    r = requests.post('https://web-capture.net/zh_TW/initiate_conversion.php', files={
+        'link': url,
+        'output': 'jpeg',
+    })
+    return r.status_code
+
+
+def report_url(content):
+    params = urllib.parse.urlencode({
+        'report': content,
+        'step1': '保存记录',
+        'design': 1
+    })
+    params = params.encode('utf-8')
+    req = urllib.request.Request('http://travian-reports.net/hk/convert', params)
+    response = urllib.request.urlopen(req)
+    return response.geturl()
+
+
+def get_report_url(name, index):
     index -= 1
     reports = report_table.get(Query().name == name)['report']
     report = parseJson(reports)[index]
-    print(report['content'])
+    url = report_url(report['content'])
+    return url
 
 
 def handle_message(data):
@@ -154,16 +178,19 @@ def handle_message_event(event):
                 event.reply_token,
                 TextSendMessage(text=get_message(name)))
     elif '報告' in text:
-        text = text.replace('報告', '')
-        if text == '':
+        matches = re.search('(.*)報告(\d+)', text)
+        if matches.group(1) == '' and matches.group(2) == '':
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text=get_all_reports()))
-        else:
-            name = text
+        elif matches.group(2) == '':
             line_bot_api.reply_message(
                 event.reply_token,
-                TextSendMessage(text=get_report(name)))
+                TextSendMessage(text=get_report(matches.group(1))))
+        else:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=get_report_url(matches.group(1), int(matches.group(2)))))
 
 
 @handler.add(JoinEvent)

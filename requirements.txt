@@ -3,3 +3,4 @@ flask
 Flask-SSLify
 gunicorn
 tinydb
+requests
