@@ -1,4 +1,6 @@
+import json
 import os
+import re
 
 from flask import Flask, request, abort
 
@@ -14,18 +16,25 @@ from linebot.models import (
 )
 from tinydb import Query
 from tinydb import TinyDB
+from tinydb.storages import MemoryStorage
 
 app = Flask(__name__)
-access_token = os.environ.get('ACCESS_TOKEN', None)
-secret = os.environ.get('SECRET', None)
+access_token = os.environ.get('ACCESS_TOKEN', 'Q+VCL2yaFLwzV8wFK19H7glBB/kj1fHm7G8Apxv2HZv8GTSlg9V8c38/VQvSMvQtcG+38nv2OlAZVrT7ZmSm+1HT1pWbE29a0ROZ27y0mchjOdeZ2hnW0HwA/wtIDNrbKNezIbc43wAo1dtOTsiMPgdB04t89/1O/w1cDnyilFU=')
+secret = os.environ.get('SECRET', '64d7bbe9e32d897d48e35a323e6f0642')
 
 line_bot_api = LineBotApi(access_token)
 handler = WebhookHandler(secret)
 messages = []
 message_index = 0
-db = TinyDB('db.json')
+db = TinyDB(storage=MemoryStorage)
 message_table = db.table('message_table')
 report_table = db.table('report_table')
+
+
+def parseJson(string):
+    string = re.sub(r"(,?)(\w+?)\s+?:", r"\1'\2' :", string)
+    string = string.replace("'", "\"")
+    return json.loads(string)
 
 
 @app.route("/callback", methods=['POST'])
@@ -48,25 +57,44 @@ def callback():
 
 
 def handle_report(data):
+    # reportStr = str(data['report'])
+    # reportStr = re.sub(r"(,?)(\w+?)\s+?:", r"\1'\2' :", reportStr)
+    # reportStr = reportStr.replace("'", "\"")
     report = str(data['report'])
     name = str(data['key'])
     if report_table.contains(Query().name == name):
         report_table.update({'report': report, 'name': name}, Query().name == name)
     else:
         report_table.insert({'report': report, 'name': name})
+    print(get_report_image('GCA', 1))
 
 
 def get_all_reports():
     all_messages = ''
+    # print((report_table.all()))
     if len(report_table.all()) == 0:
         return '沒有任何事件發生'
-    for index, data in enumerate(report_table.all()):
-        all_messages += '{}. {}\n'.format(data['name'], data['report'])
+    for data in report_table.all():
+        all_messages += '{}.\n'.format(data['name'])
+        reports = parseJson(data['report'])
+        for report in reports:
+            all_messages += '{}'.format(report['info'])
     return all_messages
 
 
 def get_report(name):
-    return report_table.get(Query().name == name)['report']
+    reports = report_table.get(Query().name == name)['report']
+    all_messages = ''
+    reports = parseJson(reports)
+    for report in reports:
+        all_messages += '{}'.format(report['info'])
+    return all_messages
+
+def get_report_image(name, index):
+    index -= 1
+    reports = report_table.get(Query().name == name)['report']
+    report = parseJson(reports)[index]
+    print(report['content'])
 
 
 def handle_message(data):
@@ -88,7 +116,6 @@ def get_all_messages():
 
 
 def get_message(name):
-    print(message_table.all())
     return message_table.get(Query().name == name)['message']
 
 
