@@ -107,8 +107,8 @@ def get_report_url(name, index):
     index -= 1
     reports = report_table.get(Query().name == name)['report']
     report = parseJson(reports)[index]
-    url = report_url(report['content'])
-    return url
+    # url = report_url(report['content'])
+    return report['url']
 
 
 def handle_message(data):
