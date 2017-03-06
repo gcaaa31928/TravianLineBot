@@ -30,6 +30,7 @@ message_index = 0
 db = TinyDB(storage=MemoryStorage)
 message_table = db.table('message_table')
 report_table = db.table('report_table')
+travian_url = 'http://ts1.travian.tw/'
 
 
 def parseJson(string):
@@ -108,7 +109,7 @@ def get_report_url(name, index):
     reports = report_table.get(Query().name == name)['report']
     report = parseJson(reports)[index]
     # url = report_url(report['content'])
-    return report['url']
+    return travian_url + report['url']
 
 
 def handle_message(data):
