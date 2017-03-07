@@ -20,8 +20,8 @@ from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
 
 app = Flask(__name__)
-access_token = os.environ.get('ACCESS_TOKEN', None)
-secret = os.environ.get('SECRET', None)
+access_token = os.environ.get('ACCESS_TOKEN', 'Q+VCL2yaFLwzV8wFK19H7glBB/kj1fHm7G8Apxv2HZv8GTSlg9V8c38/VQvSMvQtcG+38nv2OlAZVrT7ZmSm+1HT1pWbE29a0ROZ27y0mchjOdeZ2hnW0HwA/wtIDNrbKNezIbc43wAo1dtOTsiMPgdB04t89/1O/w1cDnyilFU=')
+secret = os.environ.get('SECRET', '64d7bbe9e32d897d48e35a323e6f0642')
 
 line_bot_api = LineBotApi(access_token)
 handler = WebhookHandler(secret)
@@ -153,6 +153,7 @@ def report():
     return 'ok'
 
 
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message_event(event):
     print(event)
@@ -182,6 +183,11 @@ def handle_message_event(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text=get_report_url(matches.group(1), int(matches.group(2)))))
+    elif '敬禮' in text:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="敬禮"))
+
 
 
 @handler.add(JoinEvent)
