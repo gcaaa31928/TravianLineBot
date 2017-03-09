@@ -34,8 +34,8 @@ message_table = db.table('message_table')
 report_table = db.table('report_table')
 alliance_report_table = db.table('alliance_report_table')
 travian_url = 'http://ts1.travian.tw/'
-group_id = ''
-user_id = ''
+send = {}
+
 
 
 def parseJson(string):
@@ -143,6 +143,7 @@ def handle_alliance_report(data):
         if not alliance_report_table.contains(Query().id == report['id']):
             report_table.insert({'report': report, 'id': report['id']})
             url = report_url(report['content'])
+            print(url)
             push_message(url)
 
 
@@ -175,21 +176,26 @@ def alliance_report():
     return 'ok'
 
 
-def push_message(message):
-    print(user_id)
-    line_bot_api.push_message(user_id, TextSendMessage(text=message))
+def push_message(msg):
+    print(send['id'])
+    line_bot_api.push_message(send['id'], TextSendMessage(text=msg))
     # line_bot_api.push_message(group_id, TextSendMessage(text=message))
 
+
+def set_send_id(id):
+    send['id'] = id
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message_event(event):
     print(event)
     text = event.message.text
     source = event.source
+    id = ''
     if isinstance(source, SourceUser):
-        user_id = source.user_id
+        id = source.user_id
     elif isinstance(source, SourceGroup):
-        group_id = source.group_id
+        id = source.group_id
+    set_send_id(id)
     if '狀態' in text:
         text = text.replace('狀態', '')
         if text == '':
