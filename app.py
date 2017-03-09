@@ -15,6 +15,8 @@ from linebot.models import JoinEvent
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
+from linebot.models import SourceGroup
+from linebot.models import SourceUser
 from tinydb import Query
 from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
@@ -174,6 +176,7 @@ def alliance_report():
 
 
 def push_message(message):
+    print(user_id)
     line_bot_api.push_message(user_id, TextSendMessage(text=message))
     # line_bot_api.push_message(group_id, TextSendMessage(text=message))
 
@@ -183,8 +186,10 @@ def handle_message_event(event):
     print(event)
     text = event.message.text
     source = event.source
-    group_id = source.group_id
-    user_id = source.user_id
+    if isinstance(source, SourceUser):
+        user_id = source.user_id
+    elif isinstance(source, SourceGroup):
+        group_id = source.group_id
     if '狀態' in text:
         text = text.replace('狀態', '')
         if text == '':
