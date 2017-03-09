@@ -186,6 +186,7 @@ def push_message(msg):
 def set_send_id(id):
     print(id)
     send.insert({'id': id})
+    print(send.all())
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message_event(event):
