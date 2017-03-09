@@ -30,7 +30,10 @@ message_index = 0
 db = TinyDB(storage=MemoryStorage)
 message_table = db.table('message_table')
 report_table = db.table('report_table')
+alliance_report_table = db.table('alliance_report_table')
 travian_url = 'http://ts1.travian.tw/'
+group_id = ''
+user_id = ''
 
 
 def parseJson(string):
@@ -59,9 +62,6 @@ def callback():
 
 
 def handle_report(data):
-    # reportStr = str(data['report'])
-    # reportStr = re.sub(r"(,?)(\w+?)\s+?:", r"\1'\2' :", reportStr)
-    # reportStr = reportStr.replace("'", "\"")
     report = str(data['report'])
     name = str(data['key'])
     if report_table.contains(Query().name == name):
@@ -134,6 +134,19 @@ def get_message(name):
     return message_table.get(Query().name == name)['message']
 
 
+def handle_alliance_report(data):
+    reports = str(data['report'])
+    reports = parseJson(reports)
+    for index, report in enumerate(reports):
+        if not alliance_report_table.contains(Query().id == report['id']):
+            report_table.insert({'report': report, 'id': report['id']})
+            url = report_url(report['content'])
+            push_message(url)
+
+
+
+
+
 @app.route('/')
 def hello():
     return 'Hello World'
@@ -153,11 +166,25 @@ def report():
     return 'ok'
 
 
+@app.route('/alliance_report', methods=['POST'])
+def alliance_report():
+    data = request.get_json()
+    handle_alliance_report(data)
+    return 'ok'
+
+
+def push_message(message):
+    line_bot_api.push_message(user_id, TextSendMessage(text=message))
+    # line_bot_api.push_message(group_id, TextSendMessage(text=message))
+
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message_event(event):
     print(event)
     text = event.message.text
+    source = event.source
+    group_id = source.group_id
+    user_id = source.user_id
     if '狀態' in text:
         text = text.replace('狀態', '')
         if text == '':
@@ -187,6 +214,8 @@ def handle_message_event(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text="敬禮"))
+
+
 
 
 
