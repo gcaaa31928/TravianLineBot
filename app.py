@@ -33,8 +33,9 @@ db = TinyDB(storage=MemoryStorage)
 message_table = db.table('message_table')
 report_table = db.table('report_table')
 alliance_report_table = db.table('alliance_report_table')
+send = db.table('send')
 travian_url = 'http://ts1.travian.tw/'
-send = {}
+
 
 
 
@@ -177,13 +178,13 @@ def alliance_report():
 
 
 def push_message(msg):
-    print(send['id'])
-    line_bot_api.push_message(send['id'], TextSendMessage(text=msg))
+    ppl = send.all()[0]
+    line_bot_api.push_message(ppl['id'], TextSendMessage(text=msg))
     # line_bot_api.push_message(group_id, TextSendMessage(text=message))
 
 
 def set_send_id(id):
-    send['id'] = id
+    send.insert({'id': id})
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message_event(event):
