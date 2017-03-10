@@ -142,14 +142,20 @@ def handle_alliance_report(data):
     reports = parseJson(reports)
     for index, report in enumerate(reports):
         if not alliance_report_table.contains(Query().id == report['id']):
-            report_table.insert({'report': report, 'id': report['id']})
             url = report_url(report['content'])
-            print(url)
-            push_message(url)
+            alliance_report_table.insert({'url': url, 'id': report['id'], 'read': False})
 
+def has_alliance_report():
+    if len(alliance_report_table.search(Query().read == False)) > 0:
+        return True
+    return False
 
-
-
+def get_all_alliance_report():
+    all_message = "花生戰報來囉:\n"
+    for index, report in enumerate(alliance_report_table.search(Query().read == False)):
+         all_message += '{}'.format(index) + report['url'] + '\n'
+    alliance_report_table.update({'read': True}, Query().read == False)
+    return all_message
 
 @app.route('/')
 def hello():
@@ -175,12 +181,6 @@ def alliance_report():
     data = request.get_json()
     handle_alliance_report(data)
     return 'ok'
-
-
-def push_message(msg):
-    ppl = send.all()[0]
-    line_bot_api.push_message(ppl['id'], TextSendMessage(text=msg))
-    # line_bot_api.push_message(group_id, TextSendMessage(text=message))
 
 
 def set_send_id(id):
@@ -225,9 +225,13 @@ def handle_message_event(event):
                 event.reply_token,
                 TextSendMessage(text=get_report_url(matches.group(1), int(matches.group(2)))))
     elif '敬禮' in text:
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text="敬禮"))
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="敬禮"))
+    elif has_alliance_report():
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=get_all_alliance_report()))
 
 
 
