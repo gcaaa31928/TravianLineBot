@@ -141,6 +141,7 @@ def handle_alliance_report(data):
     reports = str(data['report'])
     reports = parseJson(reports)
     for index, report in enumerate(reports):
+        print(report['id'])
         if not alliance_report_table.contains(Query().id == report['id']):
             url = report_url(report['content'])
             alliance_report_table.insert({'url': url, 'id': report['id'], 'read': False})
