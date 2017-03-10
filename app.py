@@ -153,7 +153,7 @@ def has_alliance_report():
 def get_all_alliance_report():
     all_message = "花生戰報來囉:\n"
     for index, report in enumerate(alliance_report_table.search(Query().read == False)):
-         all_message += '{}. '.format(index) + report['url'] + '\n'
+         all_message += '{}. '.format(index+1) + report['url'] + '\n'
     alliance_report_table.update({'read': True}, Query().read == False)
     return all_message
 
