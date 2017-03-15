@@ -159,6 +159,7 @@ def get_all_alliance_report():
     for index, report in enumerate(alliance_report_table.search(Query().read == False)):
          all_message += '{}. '.format(index+1) + report['url'] + '\n'
     alliance_report_table.update({'read': True}, Query().read == False)
+    print(alliance_report_table.all())
     return all_message
 
 @app.route('/')
