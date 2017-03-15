@@ -29,7 +29,7 @@ line_bot_api = LineBotApi(access_token)
 handler = WebhookHandler(secret)
 messages = []
 message_index = 0
-db = TinyDB(storage=MemoryStorage)
+db = TinyDB('db.json')
 message_table = db.table('message_table')
 report_table = db.table('report_table')
 alliance_report_table = db.table('alliance_report_table')
