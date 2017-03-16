@@ -193,6 +193,7 @@ def set_send_id(id):
     send.insert({'id': id})
     print(send.all())
 
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message_event(event):
     print(event)
@@ -203,7 +204,6 @@ def handle_message_event(event):
         id = source.user_id
     elif isinstance(source, SourceGroup):
         id = source.group_id
-    set_send_id(id)
     if '狀態' in text:
         text = text.replace('狀態', '')
         if text == '':
@@ -229,14 +229,6 @@ def handle_message_event(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text=get_report_url(matches.group(1), int(matches.group(2)))))
-    elif '敬禮' in text:
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="敬禮"))
-    elif has_alliance_report():
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=get_all_alliance_report()))
 
 
 
