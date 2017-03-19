@@ -149,6 +149,8 @@ def handle_alliance_report(data):
     #         print('new ' + report['id'])
     #         url = report_url(report['content'])
     #         alliance_report_table.insert({'url': url, 'id': report['id'], 'read': False})
+    if len(reports) <= 0:
+        return
     report = reports[0]
     if not alliance_report_table.contains(Query().id == report['id']):
         alliance_report_table.remove(Query().read == True)
