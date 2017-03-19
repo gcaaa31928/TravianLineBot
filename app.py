@@ -36,7 +36,8 @@ alliance_report_table = db.table('alliance_report_table')
 send = db.table('send')
 travian_url = 'http://ts1.travian.tw/'
 
-
+current_report = {}
+current_report_read = False
 
 
 def parseJson(string):
@@ -140,26 +141,33 @@ def get_message(name):
 def handle_alliance_report(data):
     reports = str(data['report'])
     reports = parseJson(reports)
-    for index, report in enumerate(reports):
-        print(report['id'])
-        if not alliance_report_table.contains(Query().id == report['id']):
-            print('new ' + report['id'])
-            url = report_url(report['content'])
-            alliance_report_table.insert({'url': url, 'id': report['id'], 'read': False})
+    # for index, report in enumerate(reports):
+    #     print(report['id'])
+    #     if not alliance_report_table.contains(Query().id == report['id']):
+    #         print('new ' + report['id'])
+    #         url = report_url(report['content'])
+    #         alliance_report_table.insert({'url': url, 'id': report['id'], 'read': False})
+    report = reports[0]
+    if current_report['id'] != report['id']:
+        current_report = report
+        current_report_read = False
 
 
 def has_alliance_report():
-    if len(alliance_report_table.search(Query().read == False)) > 0:
-        return True
-    return False
+    return not current_report_read
+    # if len(alliance_report_table.search(Query().read == False)) > 0:
+    #     return True
+    # return False
 
 
 def get_all_alliance_report():
+    current_report_read = True
     all_message = "花生戰報來囉:\n"
-    for index, report in enumerate(alliance_report_table.search(Query().read == False)):
-         all_message += '{}. '.format(index+1) + report['url'] + '\n'
-    alliance_report_table.update({'read': True}, Query().read == False)
-    print(alliance_report_table.all())
+    all_message += report['content']
+    # for index, report in enumerate(alliance_report_table.search(Query().read == False)):
+    #      all_message += '{}. '.format(index+1) + report['url'] + '\n'
+    # alliance_report_table.update({'read': True}, Query().read == False)
+    # print(alliance_report_table.all())
     return all_message
 
 @app.route('/')
@@ -229,7 +237,10 @@ def handle_message_event(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text=get_report_url(matches.group(1), int(matches.group(2)))))
-
+    elif has_alliance_report():
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=get_all_alliance_report()))
 
 
 
