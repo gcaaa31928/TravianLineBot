@@ -148,6 +148,8 @@ def handle_alliance_report(data):
     #         url = report_url(report['content'])
     #         alliance_report_table.insert({'url': url, 'id': report['id'], 'read': False})
     report = reports[0]
+    nonlocal current_report_read
+    nonlocal current_report
     if current_report['id'] != report['id']:
         current_report = report
         current_report_read = False
