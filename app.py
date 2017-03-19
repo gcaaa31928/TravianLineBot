@@ -22,6 +22,8 @@ from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
 
 app = Flask(__name__)
+
+
 access_token = os.environ.get('ACCESS_TOKEN', 'Q+VCL2yaFLwzV8wFK19H7glBB/kj1fHm7G8Apxv2HZv8GTSlg9V8c38/VQvSMvQtcG+38nv2OlAZVrT7ZmSm+1HT1pWbE29a0ROZ27y0mchjOdeZ2hnW0HwA/wtIDNrbKNezIbc43wAo1dtOTsiMPgdB04t89/1O/w1cDnyilFU=')
 secret = os.environ.get('SECRET', '64d7bbe9e32d897d48e35a323e6f0642')
 
@@ -148,24 +150,23 @@ def handle_alliance_report(data):
     #         url = report_url(report['content'])
     #         alliance_report_table.insert({'url': url, 'id': report['id'], 'read': False})
     report = reports[0]
-    nonlocal current_report_read
-    nonlocal current_report
-    if current_report['id'] != report['id']:
-        current_report = report
-        current_report_read = False
+    if not alliance_report_table.contains(Query().id == report['id']):
+        alliance_report_table.remove(Query().read == True)
+        alliance_report_table.insert({'content': report['content'], 'id': report['id'], 'read': False})
 
 
 def has_alliance_report():
-    return not current_report_read
-    # if len(alliance_report_table.search(Query().read == False)) > 0:
-    #     return True
-    # return False
+    if len(alliance_report_table.search(Query().read == False)) > 0:
+        return True
+    return False
 
 
 def get_all_alliance_report():
-    current_report_read = True
     all_message = "花生戰報來囉:\n"
+    report = alliance_report_table.get(Query().read == False)
+    alliance_report_table.update({'read': True}, Query.id == report['id'])
     all_message += report['content']
+
     # for index, report in enumerate(alliance_report_table.search(Query().read == False)):
     #      all_message += '{}. '.format(index+1) + report['url'] + '\n'
     # alliance_report_table.update({'read': True}, Query().read == False)
