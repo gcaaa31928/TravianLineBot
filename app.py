@@ -25,7 +25,7 @@ app = Flask(__name__)
 
 
 access_token = os.environ.get('ACCESS_TOKEN', 'Q+VCL2yaFLwzV8wFK19H7glBB/kj1fHm7G8Apxv2HZv8GTSlg9V8c38/VQvSMvQtcG+38nv2OlAZVrT7ZmSm+1HT1pWbE29a0ROZ27y0mchjOdeZ2hnW0HwA/wtIDNrbKNezIbc43wAo1dtOTsiMPgdB04t89/1O/w1cDnyilFU=')
-secret = os.environ.get('SECRET', '64d7bbe9e32d897d48e35a323e6f0642')
+secret = os.environ.get('SECRET', '63d41afb19023f069426487e8bc56ecc')
 
 line_bot_api = LineBotApi(access_token)
 handler = WebhookHandler(secret)
@@ -35,6 +35,7 @@ db = TinyDB('db.json')
 message_table = db.table('message_table')
 report_table = db.table('report_table')
 alliance_report_table = db.table('alliance_report_table')
+be_raid = db.table('be_raid')
 send = db.table('send')
 travian_url = 'http://ts1.travian.tw/'
 
@@ -143,37 +144,38 @@ def get_message(name):
 def handle_alliance_report(data):
     reports = str(data['report'])
     reports = parseJson(reports)
-    # for index, report in enumerate(reports):
-    #     print(report['id'])
-    #     if not alliance_report_table.contains(Query().id == report['id']):
-    #         print('new ' + report['id'])
-    #         url = report_url(report['content'])
-    #         alliance_report_table.insert({'url': url, 'id': report['id'], 'read': False})
     if len(reports) <= 0:
         return
     report = reports[0]
     if not alliance_report_table.contains(Query().id == report['id']):
-        alliance_report_table.remove(Query().read == True)
-        alliance_report_table.insert({'content': report['content'], 'id': report['id'], 'read': False})
+        alliance_report_table.insert({'id': report['id']})
+        line_bot_api.push_message(send.all(), TextSendMessage(text=report['content']))
 
 
-def has_alliance_report():
-    if len(alliance_report_table.search(Query().read == False)) > 0:
-        return True
-    return False
+def handle_be_raid(data):
+    villageName = str(data['village_name'])
+    villageId = str(data['village_id'])
+    if not be_raid.contains(Query().id == villageId):
+        be_raid.insert({'id': villageId})
+        line_bot_api.push_message(send.all(), TextSendMessage(text="{} 被攻擊了!!".format(villageName)))
 
-
-def get_all_alliance_report():
-    all_message = "花生戰報來囉:\n"
-    report = alliance_report_table.get(Query().read == False)
-    alliance_report_table.update({'read': True}, Query().id == report['id'])
-    all_message += report['content']
-
-    # for index, report in enumerate(alliance_report_table.search(Query().read == False)):
-    #      all_message += '{}. '.format(index+1) + report['url'] + '\n'
-    # alliance_report_table.update({'read': True}, Query().read == False)
-    # print(alliance_report_table.all())
-    return all_message
+# def has_alliance_report():
+#     if len(alliance_report_table.search(Query().read == False)) > 0:
+#         return True
+#     return False
+#
+#
+# def get_all_alliance_report():
+#     all_message = "花生戰報來囉:\n"
+#     report = alliance_report_table.get(Query().read == False)
+#     alliance_report_table.update({'read': True}, Query().id == report['id'])
+#     all_message += report['content']
+#
+#     # for index, report in enumerate(alliance_report_table.search(Query().read == False)):
+#     #      all_message += '{}. '.format(index+1) + report['url'] + '\n'
+#     # alliance_report_table.update({'read': True}, Query().read == False)
+#     # print(alliance_report_table.all())
+#     return all_message
 
 @app.route('/')
 def hello():
@@ -200,6 +202,12 @@ def alliance_report():
     handle_alliance_report(data)
     return 'ok'
 
+
+@app.route('/be_raid', methods=['POST'])
+def report():
+    data = request.get_json()
+    handle_report(data)
+    return 'ok'
 
 def set_send_id(id):
     print(id)
