@@ -155,7 +155,8 @@ def handle_alliance_report(data):
     report = reports[0]
     if not alliance_report_table.contains(Query().id == report['id']):
         alliance_report_table.insert({'id': report['id']})
-        line_bot_api.multicast(get_sender(), TextSendMessage(text=report['content']))
+        for sender in get_sender():
+            line_bot_api.push_message(sender, TextSendMessage(text=report['content']))
 
 
 def handle_be_raid(data):
@@ -164,7 +165,8 @@ def handle_be_raid(data):
     in_time = str(data['in_time'])
     if not be_raid_table.contains(Query().id == village_id):
         be_raid_table.insert({'id': village_id})
-        line_bot_api.multicast(get_sender(), TextSendMessage(text="{} 被攻擊了!! 在{}後抵達".format(village_name, in_time)))
+        for sender in get_sender():
+            line_bot_api.push_message(sender, TextSendMessage(text="{} 被攻擊了!! 在{}後抵達".format(village_name, in_time)))
 
 # def has_alliance_report():
 #     if len(alliance_report_table.search(Query().read == False)) > 0:
@@ -259,8 +261,18 @@ def handle_message_event(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text=get_report_url(matches.group(1), int(matches.group(2)))))
-
-
+    elif '敬禮' in text:
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='敬禮'))
+    elif '安安' in text:
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='安'))
+    elif '0.0' in text:
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='0.0'))
 
 
 
