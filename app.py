@@ -48,6 +48,12 @@ def parseJson(string):
     string = string.replace("'", "\"")
     return json.loads(string)
 
+def get_sender():
+    senders = []
+    for sender in send.all():
+        senders.append(sender['id'])
+    return senders
+
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -149,7 +155,7 @@ def handle_alliance_report(data):
     report = reports[0]
     if not alliance_report_table.contains(Query().id == report['id']):
         alliance_report_table.insert({'id': report['id']})
-        line_bot_api.push_message(send.all(), TextSendMessage(text=report['content']))
+        line_bot_api.multicast(get_sender(), TextSendMessage(text=report['content']))
 
 
 def handle_be_raid(data):
@@ -158,7 +164,7 @@ def handle_be_raid(data):
     in_time = str(data['in_time'])
     if not be_raid_table.contains(Query().id == village_id):
         be_raid_table.insert({'id': village_id})
-        line_bot_api.push_message(send.all(), TextSendMessage(text="{} 被攻擊了!! 在{}後抵達".format(village_name, in_time)))
+        line_bot_api.multicast(get_sender(), TextSendMessage(text="{} 被攻擊了!! 在{}後抵達".format(village_name, in_time)))
 
 # def has_alliance_report():
 #     if len(alliance_report_table.search(Query().read == False)) > 0:
