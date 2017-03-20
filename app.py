@@ -35,7 +35,7 @@ db = TinyDB('db.json')
 message_table = db.table('message_table')
 report_table = db.table('report_table')
 alliance_report_table = db.table('alliance_report_table')
-be_raid = db.table('be_raid')
+be_raid_table = db.table('be_raid')
 send = db.table('send')
 travian_url = 'http://ts1.travian.tw/'
 
@@ -156,8 +156,8 @@ def handle_be_raid(data):
     village_name = str(data['village_name'])
     village_id = str(data['village_id'])
     in_time = str(data['in_time'])
-    if not be_raid.contains(Query().id == village_id):
-        be_raid.insert({'id': village_id})
+    if not be_raid_table.contains(Query().id == village_id):
+        be_raid_table.insert({'id': village_id})
         line_bot_api.push_message(send.all(), TextSendMessage(text="{} 被攻擊了!! 在{}後抵達".format(village_name, in_time)))
 
 # def has_alliance_report():
