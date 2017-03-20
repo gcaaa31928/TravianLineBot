@@ -205,9 +205,9 @@ def alliance_report():
 
 
 @app.route('/be_raid', methods=['POST'])
-def report():
+def be_raid():
     data = request.get_json()
-    handle_report(data)
+    handle_be_raid(data)
     return 'ok'
 
 def set_send_id(id):
