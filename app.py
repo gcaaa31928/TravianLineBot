@@ -216,10 +216,11 @@ def be_raid():
     handle_be_raid(data)
     return 'ok'
 
+
 def set_send_id(id):
-    print(id)
-    send.insert({'id': id})
-    print(send.all())
+    if not send.contains(Query().id == id):
+        send.insert({'id': id})
+        print(send.all())
 
 
 @handler.add(MessageEvent, message=TextMessage)
