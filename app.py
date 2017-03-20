@@ -153,11 +153,12 @@ def handle_alliance_report(data):
 
 
 def handle_be_raid(data):
-    villageName = str(data['village_name'])
-    villageId = str(data['village_id'])
-    if not be_raid.contains(Query().id == villageId):
-        be_raid.insert({'id': villageId})
-        line_bot_api.push_message(send.all(), TextSendMessage(text="{} 被攻擊了!!".format(villageName)))
+    village_name = str(data['village_name'])
+    village_id = str(data['village_id'])
+    in_time = str(data['in_time'])
+    if not be_raid.contains(Query().id == village_id):
+        be_raid.insert({'id': village_id})
+        line_bot_api.push_message(send.all(), TextSendMessage(text="{} 被攻擊了!! 在{}後抵達".format(village_name, in_time)))
 
 # def has_alliance_report():
 #     if len(alliance_report_table.search(Query().read == False)) > 0:
