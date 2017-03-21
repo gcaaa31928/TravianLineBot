@@ -25,19 +25,23 @@ app = Flask(__name__)
 
 
 access_token = os.environ.get('ACCESS_TOKEN', 'Q+VCL2yaFLwzV8wFK19H7glBB/kj1fHm7G8Apxv2HZv8GTSlg9V8c38/VQvSMvQtcG+38nv2OlAZVrT7ZmSm+1HT1pWbE29a0ROZ27y0mchjOdeZ2hnW0HwA/wtIDNrbKNezIbc43wAo1dtOTsiMPgdB04t89/1O/w1cDnyilFU=')
-secret = os.environ.get('SECRET', '64d7bbe9e32d897d48e35a323e6f0642')
+secret = os.environ.get('SECRET', '63d41afb19023f069426487e8bc56ecc')
 
 line_bot_api = LineBotApi(access_token)
 handler = WebhookHandler(secret)
 messages = []
 message_index = 0
-db = TinyDB('db.json')
+db = TinyDB(storage=MemoryStorage)
 message_table = db.table('message_table')
 report_table = db.table('report_table')
 alliance_report_table = db.table('alliance_report_table')
+<<<<<<< HEAD
 token_table = db.table('token')
+=======
+be_raid_table = db.table('be_raid')
+>>>>>>> 59e04ca1e1b18afaa8d00721d48cbc5e9c1c2b2b
 send = db.table('send')
-travian_url = 'http://ts1.travian.tw/'
+travian_url = 'http://ts4.travian.ru/'
 
 current_report = {}
 current_report_read = False
@@ -47,6 +51,12 @@ def parseJson(string):
     string = re.sub(r"(,?)(\w+?)\s+?:", r"\1'\2' :", string)
     string = string.replace("'", "\"")
     return json.loads(string)
+
+def get_sender():
+    senders = []
+    for sender in send.all():
+        senders.append(sender['id'])
+    return senders
 
 
 @app.route("/callback", methods=['POST'])
@@ -144,18 +154,13 @@ def get_message(name):
 def handle_alliance_report(data):
     reports = str(data['report'])
     reports = parseJson(reports)
-    # for index, report in enumerate(reports):
-    #     print(report['id'])
-    #     if not alliance_report_table.contains(Query().id == report['id']):
-    #         print('new ' + report['id'])
-    #         url = report_url(report['content'])
-    #         alliance_report_table.insert({'url': url, 'id': report['id'], 'read': False})
     if len(reports) <= 0:
         return
     report = reports[0]
     if not alliance_report_table.contains(Query().id == report['id']):
-        alliance_report_table.remove(Query().read == True)
-        alliance_report_table.insert({'content': report['content'], 'id': report['id'], 'read': False})
+        alliance_report_table.insert({'id': report['id']})
+        for sender in get_sender():
+            line_bot_api.push_message(sender, TextSendMessage(text=report['content']))
 
 
 def handle_token(data):
@@ -183,6 +188,35 @@ def get_all_alliance_report():
     # print(alliance_report_table.all())
     return all_message
 
+
+def handle_be_raid(data):
+    village_name = str(data['village_name'])
+    village_id = str(data['village_id'])
+    in_time = str(data['in_time'])
+    if not be_raid_table.contains(Query().id == village_id):
+        be_raid_table.insert({'id': village_id})
+        for sender in get_sender():
+            line_bot_api.push_message(sender, TextSendMessage(text="{} 被攻擊了!! 在{}後抵達".format(village_name, in_time)))
+
+# def has_alliance_report():
+#     if len(alliance_report_table.search(Query().read == False)) > 0:
+#         return True
+#     return False
+#
+#
+# def get_all_alliance_report():
+#     all_message = "花生戰報來囉:\n"
+#     report = alliance_report_table.get(Query().read == False)
+#     alliance_report_table.update({'read': True}, Query().id == report['id'])
+#     all_message += report['content']
+#
+#     # for index, report in enumerate(alliance_report_table.search(Query().read == False)):
+#     #      all_message += '{}. '.format(index+1) + report['url'] + '\n'
+#     # alliance_report_table.update({'read': True}, Query().read == False)
+#     # print(alliance_report_table.all())
+#     return all_message
+>>>>>>> 59e04ca1e1b18afaa8d00721d48cbc5e9c1c2b2b
+
 @app.route('/')
 def hello():
     return 'Hello World'
@@ -209,16 +243,26 @@ def alliance_report():
     return 'ok'
 
 
+<<<<<<< HEAD
 @app.route('/token', methods=['POST'])
 def get_token():
     data = request.get_json()
     handle_token(data)
     return 'ok'
 
+=======
+@app.route('/be_raid', methods=['POST'])
+def be_raid():
+    data = request.get_json()
+    handle_be_raid(data)
+    return 'ok'
+
+
+>>>>>>> 59e04ca1e1b18afaa8d00721d48cbc5e9c1c2b2b
 def set_send_id(id):
-    print(id)
-    send.insert({'id': id})
-    print(send.all())
+    if not send.contains(Query().id == id):
+        send.insert({'id': id})
+        print(send.all())
 
 
 @handler.add(MessageEvent, message=TextMessage)
@@ -231,6 +275,7 @@ def handle_message_event(event):
         id = source.user_id
     elif isinstance(source, SourceGroup):
         id = source.group_id
+    set_send_id(id)
     if '狀態' in text:
         text = text.replace('狀態', '')
         if text == '':
@@ -256,11 +301,18 @@ def handle_message_event(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text=get_report_url(matches.group(1), int(matches.group(2)))))
-    elif has_alliance_report():
+    elif '敬禮' in text:
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=get_all_alliance_report()))
-
+            TextSendMessage(text='敬禮'))
+    elif '安安' in text:
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='安'))
+    elif '0.0' in text:
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='0.0'))
 
 
 
