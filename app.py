@@ -166,7 +166,7 @@ def handle_token(data):
     if len(token_table.all()) > 0:
         token_table.purge()
     print(token_table)
-    token.insert({'token': token})
+    token_table.insert({'token': token})
 
 def has_alliance_report():
     if len(alliance_report_table.search(Query().read == False)) > 0:
