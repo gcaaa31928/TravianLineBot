@@ -4,6 +4,7 @@ import re
 import urllib
 import requests
 from flask import Flask, request, abort
+from flask_cors import CORS
 
 from linebot import (
     LineBotApi, WebhookHandler
@@ -22,7 +23,7 @@ from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
 
 app = Flask(__name__)
-
+CORS(app)
 
 access_token = os.environ.get('ACCESS_TOKEN', 'Q+VCL2yaFLwzV8wFK19H7glBB/kj1fHm7G8Apxv2HZv8GTSlg9V8c38/VQvSMvQtcG+38nv2OlAZVrT7ZmSm+1HT1pWbE29a0ROZ27y0mchjOdeZ2hnW0HwA/wtIDNrbKNezIbc43wAo1dtOTsiMPgdB04t89/1O/w1cDnyilFU=')
 secret = os.environ.get('SECRET', '63d41afb19023f069426487e8bc56ecc')
@@ -240,6 +241,7 @@ def alliance_report():
 
 
 @app.route('/token', methods=['POST'])
+@crossdomain(origin='*')
 def get_token():
     data = request.get_json()
     handle_token(data)

@@ -4,3 +4,4 @@ Flask-SSLify
 gunicorn
 tinydb
 requests
+flask-cors
