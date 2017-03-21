@@ -241,7 +241,6 @@ def alliance_report():
 
 
 @app.route('/token', methods=['POST'])
-@crossdomain(origin='*')
 def get_token():
     data = request.get_json()
     handle_token(data)
