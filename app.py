@@ -35,11 +35,8 @@ db = TinyDB(storage=MemoryStorage)
 message_table = db.table('message_table')
 report_table = db.table('report_table')
 alliance_report_table = db.table('alliance_report_table')
-<<<<<<< HEAD
 token_table = db.table('token')
-=======
 be_raid_table = db.table('be_raid')
->>>>>>> 59e04ca1e1b18afaa8d00721d48cbc5e9c1c2b2b
 send = db.table('send')
 travian_url = 'http://ts4.travian.ru/'
 
@@ -215,7 +212,6 @@ def handle_be_raid(data):
 #     # alliance_report_table.update({'read': True}, Query().read == False)
 #     # print(alliance_report_table.all())
 #     return all_message
->>>>>>> 59e04ca1e1b18afaa8d00721d48cbc5e9c1c2b2b
 
 @app.route('/')
 def hello():
@@ -243,22 +239,18 @@ def alliance_report():
     return 'ok'
 
 
-<<<<<<< HEAD
 @app.route('/token', methods=['POST'])
 def get_token():
     data = request.get_json()
     handle_token(data)
     return 'ok'
 
-=======
 @app.route('/be_raid', methods=['POST'])
 def be_raid():
     data = request.get_json()
     handle_be_raid(data)
     return 'ok'
 
-
->>>>>>> 59e04ca1e1b18afaa8d00721d48cbc5e9c1c2b2b
 def set_send_id(id):
     if not send.contains(Query().id == id):
         send.insert({'id': id})
