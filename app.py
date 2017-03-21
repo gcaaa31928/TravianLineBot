@@ -31,13 +31,13 @@ line_bot_api = LineBotApi(access_token)
 handler = WebhookHandler(secret)
 messages = []
 message_index = 0
-db = TinyDB('db.json')
+db = TinyDB(storage=MemoryStorage)
 message_table = db.table('message_table')
 report_table = db.table('report_table')
 alliance_report_table = db.table('alliance_report_table')
 be_raid_table = db.table('be_raid')
 send = db.table('send')
-travian_url = 'http://ts1.travian.tw/'
+travian_url = 'http://ts4.travian.ru/'
 
 current_report = {}
 current_report_read = False
