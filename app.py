@@ -35,6 +35,7 @@ db = TinyDB('db.json')
 message_table = db.table('message_table')
 report_table = db.table('report_table')
 alliance_report_table = db.table('alliance_report_table')
+token_table = db.table('token')
 send = db.table('send')
 travian_url = 'http://ts1.travian.tw/'
 
@@ -157,6 +158,13 @@ def handle_alliance_report(data):
         alliance_report_table.insert({'content': report['content'], 'id': report['id'], 'read': False})
 
 
+def handle_token(data):
+    token = data['token']
+    if len(token_table.all()) > 0:
+        token_table.purge()
+    print(token_table)
+    token.insert({'token': token})
+
 def has_alliance_report():
     if len(alliance_report_table.search(Query().read == False)) > 0:
         return True
@@ -200,6 +208,12 @@ def alliance_report():
     handle_alliance_report(data)
     return 'ok'
 
+
+@app.route('/token', methods=['POST'])
+def get_token():
+    data = request.get_json()
+    handle_token(data)
+    return 'ok'
 
 def set_send_id(id):
     print(id)
