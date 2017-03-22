@@ -312,7 +312,7 @@ def handle_message_event(event):
     elif gs.detect(text) == 'ru':
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=gs.translate(text, 'zh-TW')))
+            TextSendMessage(text=gs.translate(text, 'zh-TW', source_language='ru')))
 
 
 
