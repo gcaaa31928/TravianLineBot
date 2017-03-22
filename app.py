@@ -21,6 +21,9 @@ from linebot.models import SourceUser
 from tinydb import Query
 from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
+import goslate
+
+gs = goslate.Goslate()
 
 app = Flask(__name__)
 CORS(app)
@@ -306,6 +309,11 @@ def handle_message_event(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='0.0'))
+    elif gs.detect(text) == 'ru':
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=gs.translate(text, 'zh-TW')))
+
 
 
 
