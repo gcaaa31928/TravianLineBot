@@ -21,9 +21,7 @@ from linebot.models import SourceUser
 from tinydb import Query
 from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
-import goslate
-
-gs = goslate.Goslate()
+from textblob.blob import TextBlob
 
 app = Flask(__name__)
 CORS(app)
@@ -272,6 +270,7 @@ def handle_message_event(event):
     elif isinstance(source, SourceGroup):
         id = source.group_id
     set_send_id(id)
+    blob = TextBlob(text)
     if '狀態' in text:
         text = text.replace('狀態', '')
         if text == '':
@@ -309,10 +308,10 @@ def handle_message_event(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='0.0'))
-    elif gs.detect(text) == 'ru':
+    elif blob.detect_language() == 'ru':
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=gs.translate(text, 'zh-TW', source_language='ru')))
+            TextSendMessage(text=blob.translate(to='zh-TW')))
 
 
 

@@ -1,4 +1,3 @@
-import goslate
-
-gs = goslate.Goslate()
-print(type(gs.detect('разведывает')))
+from textblob.blob import TextBlob
+blob = TextBlob('Готово')
+print(blob.translate(to='zh-TW'))
