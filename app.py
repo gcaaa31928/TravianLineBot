@@ -311,7 +311,7 @@ def handle_message_event(event):
     elif blob.detect_language() == 'ru':
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=blob.translate(to='zh-TW')))
+            TextSendMessage(text=str(blob.translate(to='zh-TW'))))
 
 
 

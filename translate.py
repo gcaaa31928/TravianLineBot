@@ -1,3 +1,3 @@
 from textblob.blob import TextBlob
-blob = TextBlob('Готово')
-print(blob.translate(to='zh-TW'))
+blob = TextBlob('Уровень')
+print(str(blob.translate(to='zh-TW')))
